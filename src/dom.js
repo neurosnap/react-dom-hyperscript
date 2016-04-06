@@ -1,5 +1,4 @@
-import { createElement } from 'react';
-
+import React from 'react';
 const TAG_NAMES = [
   'a', 'abbr', 'address', 'area', 'article', 'aside', 'audio', 'b', 'base',
   'bdi', 'bdo', 'blockquote', 'body', 'br', 'button', 'canvas', 'caption',
@@ -20,7 +19,8 @@ const splitSelector = param => ({
   selector: param.slice(1, param.length)
 });
 const selectorToClassName = param => param.replace(' .', ' ').replace('.', ' ');
-const isChildren = x => isValidString(x) || Array.isArray(x);
+const isChildren = x =>
+  (isValidString(x) || typeof x === 'boolean' || typeof x === 'number' || Array.isArray(x));
 const flatten = arr => {
   let flat = [];
   for (let i = 0; i < arr.length; i++) {
@@ -32,7 +32,7 @@ const flatten = arr => {
     }
   }
   return flat;
-}
+};
 
 const selectorProps = (param) => {
   const { selectorId, selector } = splitSelector(param);
@@ -47,7 +47,11 @@ const selectorProps = (param) => {
   return props;
 };
 
-const hh = component => (first, second, third) => {
+const createElement = (component, props = null, children) => {
+  return React.createElement.apply(React, flatten([component, props, children]));
+};
+
+const factory = component => (first, second, third) => {
   if (typeof first === 'undefined') {
     return createElement(component);
   }
@@ -55,42 +59,37 @@ const hh = component => (first, second, third) => {
   if (isSelector(first)) {
     const props = selectorProps(first);
     if (isChildren(second)) {
-      return createElement.apply(null, flatten([component, props, second]));
+      return createElement(component, props, second);
     }
 
     if (isChildren(third)) {
-      const props = { ...second, ...selectorProps(first) };
-      if (props.className == '_app_components_loading__loadingContainer') {
-        console.log(flatten([component, props, third]));
-      }
-      return createElement.apply(null, flatten([component, props, third]));
+      return createElement(component, { ...second, ...props }, third);
     }
 
-    return createElement(component, props);
+    return createElement(component, { ...second, ...props });
   }
 
   if (isChildren(first)) {
-    return createElement.apply(null, flatten([component, first]));
+    return createElement(component, null, first);
   }
 
   if (isChildren(second)) {
-    return createElement.apply(null, flatten([component, first, second]));
+    return createElement(component, first, second);
   }
 
   return createElement(component, first);
-}
+};
 
 function h(component, ...rest) {
-  return hh(component)(...rest);
+  return factory(component)(...rest);
 }
 
 function getExports() {
-  const exported = { h, hh };
+  const exported = { h, factory };
   TAG_NAMES.forEach(n => {
-    exported[n] = hh(n);
+    exported[n] = factory(n);
   });
   return exported;
 }
 
 module.exports = getExports();
-
