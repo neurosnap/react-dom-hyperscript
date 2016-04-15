@@ -18,7 +18,7 @@ const splitSelector = param => ({
   selectorId: param[0],
   selector: param.slice(1, param.length)
 });
-const selectorToClassName = param => param.replace(' .', ' ').replace('.', ' ');
+const selectorToClassName = param => param.replace(/ \./g, ' ').replace(/\./g, ' ');
 const isChildren = x =>
   (isValidString(x) || typeof x === 'boolean' || typeof x === 'number' || Array.isArray(x));
 const flatten = arr => {
@@ -47,9 +47,8 @@ const selectorProps = (param) => {
   return props;
 };
 
-const createElement = (component, props = null, children) => {
-  return React.createElement.apply(React, flatten([component, props, children]));
-};
+const createElement = (component, props = null, children) =>
+  React.createElement.apply(React, flatten([component, props, children]));
 
 const factory = component => (first, second, third) => {
   if (typeof first === 'undefined') {
