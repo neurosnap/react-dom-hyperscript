@@ -25,11 +25,11 @@ For elements that have already been compiled by `factory`:
 
 ```js
 tagName(selector)
-tagName(attrs)
+tagName(props)
 tagName(children)
-tagName(attrs, children)
+tagName(props, children)
 tagName(selector, children)
-tagName(selector, attrs, children)
+tagName(selector, props, children)
 ```
 
 For custom components or tags not compiled by `factory`:
@@ -38,11 +38,11 @@ For custom components or tags not compiled by `factory`:
 import { h } from 'react-dom-hyperscript';
 
 h(component, selector)
-h(component, attrs)
+h(component, props)
 h(component, children)
-h(component, attrs, children)
+h(component, props, children)
 h(component, selector, children)
-h(component, selector, attrs, children)
+h(component, selector, props, children)
 ```
 
 Create your own custom tags:
@@ -60,9 +60,17 @@ class CustomComponent extends Component {
 module.exports = factory(CustomComponent);
 ```
 
+```js
+import { factory, div } from 'react-dom-hyperscript';
+
+const CustomStatelessComponent = () => div('we did it!');
+
+module.exports = factory(CustomeStatelessComponent);
+```
+
 * `component` is an HTML element as a string or a react function/class custom element
 * `selector` is string, starting with "." or "#"
-* `attrs` is an object of attributes (the props of the component)
+* `props` is an object of attributes (the props of the component)
 * `children` is the innerHTML text (string|boolean|number), or an array of elements
 
 Note: `children` cannot be a single component, it must be an array of components even if there is only one single node.
